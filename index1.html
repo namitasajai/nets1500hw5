@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Random Review Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-light">
+    <div class="container mt-5">
+      <h2 class="mb-3">Reviews from reviews.csv</h2>
+      <div class="d-flex">
+        <label class="me-2" for="topic">Select a topic:</label>
+        <select class="form-select me-2" id="topic" style="width: auto;">
+          <option value="">--Select a topic--</option>
+        </select>
+        <button
+          class="btn btn-primary"
+          onclick="generateReview('reviews')"
+        >
+          Generate Review
+        </button>
+      </div>
+      <hr />
+      <h3 id="title"></h3>
+      <p id="text"></p>
+
+      <h2 class="mb-3">Reviews from labeledreviews.csv</h2>
+      <div class="d-flex">
+        <label class="me-2" for="labeled_topic">Select a topic:</label>
+        <select class="form-select me-2" id="labeled_topic" style="width: auto;">
+          <option value="">--Select a topic--</option>
+        </select>
+        <button
+          class="btn btn-primary"
+          onclick="generateReview('labeledreviews')"
+        >
+          Generate Review
+        </button>
+      </div>
+      <hr />
+      <h3 id="labeled_title"></h3>
+      <p id="labeled_text"></p>
+    </div>
+
+    <script>
+      function parseCSV(file) {
+        return fetch(file)
+          .then((response) => response.text())
+          .then((data) => {
+            const parsedData = Papa.parse(data, {
+              header: true,
+              skipEmptyLines: true,
+            });
+            return parsedData.data;
+          });
+      }
+
+      function populateDropdown(reviews, dropdownId) {
+        const topics = reviews
+          .map((review) => review["Topic Label"])
+          .filter((value, index, self) => self.indexOf(value) === index);
+
+        const select = document.getElementById(dropdownId);
+        topics.forEach((topic) => {
+          const option = document.createElement("option");
+          option.text = topic;
+          option.value = topic;
+          select.add(option);
+        });
+      }
+
+      function generateReview(source) {
+        const topicId = source === "reviews" ? "topic" : "labeled_topic";
+        const titleId = source === "reviews" ? "title" : "labeled_title";
+        const textId = source === "reviews" ? "text" : "labeled_text";
+
+        const topic = document.getElementById(topicId).value;
+        if (topic === "") {
+          alert("Please select a topic");
+          return;
+        }
+
+        const loadingBar = document.getElementById("loading-bar");
+        const loadingBarProgress = document.querySelector("#loading-bar .bar");
+        loadingBar.style.display = "block";
+
+        setTimeout(function () {
+          const filteredReviews = window[source].filter(function (d) {
+            return d["Topic Label"] === topic;
+          });
+
+          const randomReview =
+            filteredReviews[Math.floor(Math.random() * filteredReviews.length)];
+
+          document.getElementById(titleId).textContent =
+            randomReview["Review Title"];
+          document.getElementById(textId).textContent =
+            randomReview["Review Text"];
+
+          loadingBarProgress.style.width = "100%";
+          setTimeout(function () {
+            loadingBar.style.display = "none";
+            loadingBarProgress.style.width = "0%";
+          }, 500);
+        }, 2000);
+      }
+
+      parseCSV("cluster_reviews.csv").then((reviews) => {
+        window.reviews = reviews;
+        populateDropdown(reviews, "topic");
+      });
+
+      parseCSV("labeled_reviews.csv").then((reviews) => {
+        window.labeledreviews = reviews;
+        populateDropdown(reviews, "labeled_topic");
+      });
+    </script>
+  </body>
+</html>
