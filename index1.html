@@ -12,16 +12,20 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="bg-light">
+    <div id="loading-bar">
+      <div class="bar"></div>
+    </div>
     <div class="container mt-5">
-      <h2 class="mb-3">Reviews from reviews.csv</h2>
+      <h2 class="mb-3">Random Review Generator: Word2Vec Model</h2>
       <div class="d-flex">
         <label class="me-2" for="topic">Select a topic:</label>
-        <select class="form-select me-2" id="topic" style="width: auto;">
+        <select class="form-select me-2" id="topic" style="width: auto">
           <option value="">--Select a topic--</option>
         </select>
         <button
           class="btn btn-primary"
           onclick="generateReview('reviews')"
+          id="generate"
         >
           Generate Review
         </button>
@@ -29,16 +33,17 @@
       <hr />
       <h3 id="title"></h3>
       <p id="text"></p>
-
-      <h2 class="mb-3">Reviews from labeledreviews.csv</h2>
+      <br> 
+      <h2 class="mb-3">Random Review Generator: Manual Model</h2>
       <div class="d-flex">
         <label class="me-2" for="labeled_topic">Select a topic:</label>
-        <select class="form-select me-2" id="labeled_topic" style="width: auto;">
+        <select class="form-select me-2" id="labeled_topic" style="width: auto">
           <option value="">--Select a topic--</option>
         </select>
         <button
           class="btn btn-primary"
           onclick="generateReview('labeledreviews')"
+          id="generate"
         >
           Generate Review
         </button>
